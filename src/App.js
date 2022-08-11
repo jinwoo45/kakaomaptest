@@ -1,23 +1,75 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState, useEffect } from 'react';
 
 function App() {
+
+  const { kakao } = window;
+
+  useEffect(() => {
+    let mapContainer = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+    let mapOption = { //지도를 생성할 때 필요한 기본 옵션
+      center: new kakao.maps.LatLng(40.5214662, 127.0507572), //지도의 중심좌표.
+      level: 3 //지도의 레벨(확대, 축소 정도)
+    };
+
+    let map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다.
+    // HTML5의 geolocaiton으로 사용할 수 있는지 확인합니다.
+    if (navigator.geolocation) {
+      // GeoLocation을 이용해서 접속 위치를 얻어옵니다.
+      navigator.geolocation.getCurrentPosition(function (position) {
+
+        var lat = position.coords.latitude, // 위도
+          lon = position.coords.longitude; // 경도
+
+        var locPostion = new kakao.maps.LatLng(lat, lon), //마커가 표시될 위치를 geolocation 좌표로 생성합니다.
+          message = '<div style="padding:5px;">여기는 티엔메타?!</div>'; // 인포윈도우에 표시될 내용입니다.
+
+        // 마커와 인포윈도우를 표시합니다.
+        displayMarker(locPostion, message);
+      });
+    } else {
+
+    }
+
+    // 지도에 마커와 인포윈도우를 표시하는 함수입니다.
+    function displayMarker(locPostion, message) {
+
+      // 마커를 생성합니다.
+      var marker = new kakao.maps.Marker({
+        map: map,
+        position: locPostion
+      });
+
+      var iwContent = message, // 인포윈도우에 표시할 내용
+        iwRemoveable = true;
+
+      // 인포윈도우를 생성합니다.
+      var infowindow = new kakao.maps.InfoWindow({
+        content: iwContent,
+        removable: iwRemoveable
+      });
+
+      // 인포윈도우를 마커위에 표시합니다.
+      infowindow.open(map, marker);
+
+      // 지도 중심좌표를 접속위치로 변경합니다.
+      map.setCenter(locPostion);
+    }
+
+  }, []);
+
+
+
+
+
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      카카오맵
+      <div id="map"></div>
+
     </div>
   );
 }
